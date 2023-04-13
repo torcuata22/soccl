@@ -1,10 +1,12 @@
 from . import views
 from django.urls import path
-from .views import home
+from .views import home, events
 
 urlpatterns = [
     path('', views.home, name='home'),
     path('<int:year>/<str:month>/', views.home, name='home'),
+    path('events', views.events, name='list-events'),
+
 ]
 
 
