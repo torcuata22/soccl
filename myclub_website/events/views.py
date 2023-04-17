@@ -6,6 +6,8 @@ from datetime import datetime
 from .models import Event, Venue
 from .forms import VenueForm, EventForm
 from django.http import HttpResponseRedirect #makes form redirect back to itself
+#to generate text files on the fly:
+from django.http import HttpResponse
 
 # Create your views here.
 def home(request, year=datetime.now().year, month=datetime.now().strftime('%B')):
@@ -32,7 +34,7 @@ def home(request, year=datetime.now().year, month=datetime.now().strftime('%B'))
 
 
 def events(request):
-    event_list = Event.objects.all()
+    event_list = Event.objects.all().order_by('event_date')
     return render(request, 'events/event_list.html', {'event_list':event_list})
 
 
@@ -52,7 +54,7 @@ def add_venue(request):
 
 
 def list_venues(request):
-    venue_list = Venue.objects.all()
+    venue_list = Venue.objects.all().order_by('name')
     return render(request, 'events/venues.html', {'venue_list':venue_list})
 
 def show_venue(request, venue_id):
@@ -110,3 +112,29 @@ def delete_venue(request, venue_id):
     venue = Venue.objects.get(pk=venue_id)
     venue.delete()
     return redirect('list_venues')
+
+
+#GENERATE TEXT FILE:
+def venue_text(request):
+    response = HttpResponse(content_type='text/plain')
+    response['Content-Disposition'] = 'attachment; filename=venues.txt'
+    #Designate the model:
+    venues = Venue.objects.all()
+    lines=[]
+    #Loop through and uotput:
+    for venue in venues:
+        lines.append(f'{venue.name}\n{venue.address}\n{venue.phone}\n{venue.email}\n\n\n\n')
+    response.writelines(lines)
+    return response
+    
+    #Example:
+    # lines = ["This is a line1\n",
+    #          "This is a line2\n",
+    #          "This is a line3\n\n",
+    #          "Python is awesome!"]
+    #write to text file:
+    # response.writelines(lines)
+    # return response
+
+
+    #CSV FILES: https://www.youtube.com/watch?v=ggz8wkjljaM&list=PLCC34OHNcOtqW9BJmgQPPzUpJ8hl49AGy&index=16
