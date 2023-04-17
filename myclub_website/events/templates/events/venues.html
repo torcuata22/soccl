@@ -11,7 +11,10 @@
         <tr>
             <td><a href="{% url 'show_venue' venue.id %}">{{venue}}</a></td>
             <td align="right">
-                <a class="btn btn-outline-success btn-sm" href="{% url 'update_venue' venue.id %}">Update</a></td>
+                <a class="btn btn-outline-success btn-sm" href="{% url 'update_venue' venue.id %}">Update</a>
+                <a class="btn btn-outline-danger btn-sm" href="{% url 'delete_venue' venue.id %}">Delete</a>
+            </td>
+
         </tr>
         {% endfor %}
     </table>
