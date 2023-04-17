@@ -91,3 +91,11 @@ def add_event(request):
     return render(request, 'events/add_event.html', {'form':form, 'submitted':submitted})
     
 
+def update_event(request, event_id):
+    event=Event.objects.get(pk=event_id)
+    form = EventForm(request.POST or None, instance=event)
+    if form.is_valid():
+        form.save()
+        return redirect('list-events')
+
+    return render(request, 'events/update_event.html', {'event':event, 'form':form})
