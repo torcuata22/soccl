@@ -8,7 +8,16 @@ from .forms import VenueForm, EventForm
 from django.http import HttpResponseRedirect #makes form redirect back to itself
 #to generate text files on the fly:
 from django.http import HttpResponse
+#to generate csv files
 import csv
+#imports needed to generate pdf files:
+from django.http import FileResponse
+import io
+from reportlab.pdfgen import canvas
+from reportlab.lib.units import inch
+from reportlab.lib.pagesizes import letter
+
+
 
 # Create your views here.
 def home(request, year=datetime.now().year, month=datetime.now().strftime('%B')):
@@ -139,11 +148,51 @@ def venue_csv(request):
     venues = Venue.objects.all()
    #Add column headings to csv file:
     writer.writerow(['Venue Name','Address','Zip Code','Phone','Web Address','Email'])
-
     #Loop through and append to spreadsheet:
     for venue in venues:
         writer.writerow([venue.name, venue.address, venue.phone, venue.web, venue.email])
     return response
+
+#GENERATE PDF FILE:
+#need to pip install reportlab (also installs pillow)
+def venue_pdf(request):
+    #Create Bytestram buffer:
+    buf = io.BytesIO()
+    #Create Canvas:
+    c = canvas.Canvas(buf, pagesize=letter, bottomup=0)
+    #Create text object:
+    textob = c.beginText()
+    textob.setTextOrigin(inch, inch)
+    textob.setFont("Helvetica", 14)
+
+    #To Add lines of text:
+    # lines=[
+    #     "this is line 1",
+    #     "this is line 2",
+    #     "this is line 3",
+    # ]
+    # for line in lines:
+    #     textob.textLine(line)
+    venues = Venue.objects.all()
+    lines=[]
+    for venue in venues:
+        lines.append(venue.name)
+        lines.append(venue.address)
+        lines.append(venue.zip_code)
+        lines.append(venue.phone)
+        lines.append(venue.web)
+        lines.append(venue.email)
+        lines.append('')
+        
+    for line in lines:
+         textob.textLine(line)
+    #finish:
+    c.drawText(textob)
+    c.showPage()
+    c.save()
+    buf.seek(0)
+
+    return FileResponse(buf, as_attachment=True, filename='venues.pdf')
         
 
 
