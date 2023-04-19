@@ -8,6 +8,7 @@ from .forms import VenueForm, EventForm
 from django.http import HttpResponseRedirect #makes form redirect back to itself
 #to generate text files on the fly:
 from django.http import HttpResponse
+import csv
 
 # Create your views here.
 def home(request, year=datetime.now().year, month=datetime.now().strftime('%B')):
@@ -127,14 +128,22 @@ def venue_text(request):
     response.writelines(lines)
     return response
     
-    #Example:
-    # lines = ["This is a line1\n",
-    #          "This is a line2\n",
-    #          "This is a line3\n\n",
-    #          "Python is awesome!"]
-    #write to text file:
-    # response.writelines(lines)
-    # return response
+
+#GENERATE CSV FILE:
+def venue_csv(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=venues.csv'
+    #create csv writer:
+    writer=csv.writer(response)
+    #Designate the model:
+    venues = Venue.objects.all()
+   #Add column headings to csv file:
+    writer.writerow(['Venue Name','Address','Zip Code','Phone','Web Address','Email'])
+
+    #Loop through and append to spreadsheet:
+    for venue in venues:
+        writer.writerow([venue.name, venue.address, venue.phone, venue.web, venue.email])
+    return response
+        
 
 
-    #CSV FILES: https://www.youtube.com/watch?v=ggz8wkjljaM&list=PLCC34OHNcOtqW9BJmgQPPzUpJ8hl49AGy&index=16
