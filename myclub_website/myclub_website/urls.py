@@ -21,3 +21,12 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('events.urls')),
 ]
+
+#changes to admin site:
+#Configure Admin Titles:
+admin.site.site_header="My Coven Administration Page"
+#Browser tab:
+admin.site.site_title="My Coven App"
+#Site administration:
+admin.site.index_title="Welcome to the Admin area"
+#css for admin is in the venv >lib> django> contrib > admin > static > admin > css (base.css is the amin one)
