@@ -20,6 +20,8 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('events.urls')),
+    path('members', include('django.contrib.auth.urls')), #allows us to use urls that come with auth system
+    path('members', include('members.urls')),
 ]
 
 #changes to admin site:
