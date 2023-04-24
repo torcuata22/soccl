@@ -4,7 +4,7 @@ import calendar
 from calendar import HTMLCalendar
 from datetime import datetime
 from .models import Event, Venue
-from .forms import VenueForm, EventForm
+from .forms import VenueForm, EventFormAdmin, UserEventForm
 from django.http import HttpResponseRedirect #makes form redirect back to itself
 #to generate text files on the fly:
 from django.http import HttpResponse
@@ -56,7 +56,9 @@ def add_venue(request):
     if request.method == "POST":
         form=VenueForm(request.POST)
         if form.is_valid():
-            form.save()
+            venue=form.save(commit=False) #don't save yet because we want to attach the id to the request
+            venue.owner = request.user.id #user.id is the loggedin user
+            venue.save() #save the venue object
             return HttpResponseRedirect('/add_venue?submitted=True')
     else:
         form=VenueForm
@@ -101,12 +103,26 @@ def update_venue(request, venue_id):
 def add_event(request):
     submitted=False
     if request.method == "POST":
-        form=EventForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect('/add_event?submitted=True')
+        if request.user.is_superuser:
+            form=EventFormAdmin(request.POST) #goes to form for super user
+            if form.is_valid():
+                form.save()
+                return HttpResponseRedirect('/add_event?submitted=True')
+        else:
+            form=UserEventForm(request.POST) #goes to form for regular users
+            if form.is_valid():
+                #to associate user id with the event:
+                event = form.save(commit=False)
+                event.manager = request.user
+                event.save()                
+                return HttpResponseRedirect('/add_event?submitted=True')
+            
+    #This one goes to the form to be filled (empty)    
     else:
-        form=EventForm
+        if request.user.is_superuser:
+            form=EventFormAdmin
+        else:
+            form=UserEventForm    
         if 'submitted' in request.GET:
             submitted = True
 
@@ -115,7 +131,10 @@ def add_event(request):
 
 def update_event(request, event_id):
     event=Event.objects.get(pk=event_id)
-    form = EventForm(request.POST or None, instance=event)
+    if request.user.is_superuser:
+        form = EventFormAdmin(request.POST or None, instance=event)
+    else:
+        form = UserEventForm(request.POST or None, instance=event)
     if form.is_valid():
         form.save()
         return redirect('list-events')
