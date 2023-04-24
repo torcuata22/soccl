@@ -4,6 +4,7 @@ import calendar
 from calendar import HTMLCalendar
 from datetime import datetime
 from .models import Event, Venue
+from django.contrib.auth.models import User #import User model to create query
 from .forms import VenueForm, EventFormAdmin, UserEventForm
 from django.http import HttpResponseRedirect #makes form redirect back to itself
 #to generate text files on the fly:
@@ -19,6 +20,9 @@ from reportlab.lib.pagesizes import letter
 
 #For pagination:
 from django.core.paginator import Paginator
+
+#Messages:
+from django.contrib import messages
 
 
 
@@ -81,7 +85,9 @@ def list_venues(request):
 
 def show_venue(request, venue_id):
     venue=Venue.objects.get(pk=venue_id)
-    return render(request, 'events/show_venue.html', {'venue':venue})
+    #query Venue to access name of the venue owner's username
+    venue_owner = User.objects.get(pk=venue.owner)
+    return render(request, 'events/show_venue.html', {'venue':venue, 'venue_owner':venue_owner})
 
 def search_venues(request):
     if request.method == 'POST':
@@ -144,8 +150,14 @@ def update_event(request, event_id):
 
 def delete_event(request, event_id):
     event = Event.objects.get(pk=event_id)
-    event.delete()
-    return redirect('list-events')
+    #Check if the person who is logged in is the event manager, so they are authorized to delete
+    if request.user == event.manager:
+        event.delete()
+        messages. success(request, "Event has been deleted")
+        return redirect('list-events')
+    else:
+        messages. success(request, "You are not authorized to delete this event")
+        return redirect('list-events')
 
 def delete_venue(request, venue_id):
     venue = Venue.objects.get(pk=venue_id)
@@ -225,3 +237,21 @@ def venue_pdf(request):
         
 
 
+def my_events(request):
+    if request.user.is_authenticated:
+        me = request.user.id
+        events = Event.objects.filter(attendees=me) #filter(model field = value)
+        return render(request, 
+                      'events/my_events.html', 
+                      {'me':me, 'events':events})
+    else:
+        messages.success(request, "You aren't authorized to see this pate")
+        return redirect('home')
+
+def search_events(request):
+    if request.method == 'POST':
+        searched = request.POST['searched']
+        events = Event.objects.filter(description__contains=searched)  #returned search results
+        return render(request, 'events/search_events.html', {'searched':searched, 'events':events})
+    else:
+        return render(request, 'events/search_events.html', {}) 

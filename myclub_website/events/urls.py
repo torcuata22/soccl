@@ -1,6 +1,6 @@
 from . import views
 from django.urls import path
-from .views import home, events, list_venues, show_venue, update_venue, add_event, update_event, delete_event
+from .views import home, events, list_venues, show_venue, update_venue, add_event, update_event, delete_event, my_events, search_events
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -18,6 +18,10 @@ urlpatterns = [
     path('venue_text/', views.venue_text, name='venue_text'),    
     path('venue_csv/', views.venue_csv, name='venue_csv'),    
     path('venue_pdf/', views.venue_pdf, name='venue_pdf'),    
+    path('my_events/', views.my_events, name='my_events'),    
+    path('search_events/', views.search_events, name='search_events'),    
+
+
 
 
 
