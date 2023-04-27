@@ -262,3 +262,41 @@ def search_events(request):
         return render(request, 'events/search_events.html', {'searched':searched, 'events':events})
     else:
         return render(request, 'events/search_events.html', {}) 
+
+#Admin approval page    
+def admin_approval(request):
+    event_count = Event.objects.all().count()
+    venue_count = Venue.objects.all().count()
+    user_count = User.objects.all().count()
+
+
+
+    event_list = Event.objects.all().order_by('-event_date') #list all events in specific order
+    if request.user.is_superuser:
+        if request.method == 'POST':
+            #create list of checked box ids:
+            id_list = request.POST.getlist('boxes')
+           
+           #uncheck all boxes (clean slate)
+            event_list.update(approved=False)
+            #tell database to update the ids to approve them:
+            for x in id_list:
+                Event.objects.filter(pk=int(x)).update(approved=True)
+            messages.success(request,('Event approval has been updated') )        
+            return redirect('list-events')
+            
+        else:
+            return render(request, 'events/admin_approval.html', {'event_list':event_list, 
+                                                                  'event_count':event_count,
+                                                                  'venue_count':venue_count,
+                                                                  'user_count':user_count, 
+                                                                  })
+
+    else:
+        messages.success(request,('You shall not pass!') )
+        return redirect('home')
+    
+    return render(request, 'events/admin_approval.html')
+
+
+#CONTINUE HERE: https://www.youtube.com/watch?v=hyzM1lpc6Rs&list=PLCC34OHNcOtqW9BJmgQPPzUpJ8hl49AGy&index=45
