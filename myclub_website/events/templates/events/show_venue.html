@@ -15,9 +15,13 @@
                 <li>Zip Code: {{venue.zip_code}}</li>
                 <li>Email: {{venue.email}}</li>
                 <li>Owner:{{ venue_owner }}</li>
-                <li>Owner:{{ venue_owner.email }}</li>
+                <li>Owner's Email:{{ venue_owner.email }}</li>
 
             </ul>
+            <br>
+            {% if venue.venue_image %}
+                <img class="img-fluid" src="{{ venue.venue_image.url }}" alt="">
+            {% endif %}
         </div>
       </div>
 </div>

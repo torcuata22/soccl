@@ -8,8 +8,55 @@
     <br><br>
    {{ cal | safe }}
    <br><br><br>
-  
+  <h3>Events this month</h3>
+
+</center>
+
+{% if event_list %}
+    {% for event in event_list %}
+
+        <div class="card m-5">
+            <div class="card-header">
+                <strong>{{ event }}</strong>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Venue: {{ event.venue }}</h5>
+                <p class="card-text">
+                
+                    <strong>Date:</strong> {{ event.event_date }} <br>
+                    
+                    <strong>Website:</strong> {{ event.venue.web }}<br>
+                    <strong>Manager:</strong> {{ event.manager }}<br>
+                    <strong>Description:</strong> {{ event.description }} <br>
+                    <strong>
+                        Attendees: <br>
+                    </strong>
+                        {% for user in event.attendees.all %}
+                            {{ user }} <br>
+                        {% endfor %}
+                </p>
+            
+            
+            
+            {% if user.is_authenticated %}
+            {% if user == event.manager %}
+                  <a href="{% url 'update_event' event.id %}" class="btn btn-outline-success">Update Event</a>
+                  <a href="{% url 'delete_event' event.id %}" class="btn btn-outline-danger">Delete Event</a>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    </div>
+            {% endfor %}
+  {% else %}
+  Sorry, there are no events this month
+
+  {% endif %}
+
+
+ 
    <br><br><br>
+<center>
    Copyright (c) {{ current_year }}
 </center>
 

@@ -38,6 +38,12 @@ def home(request, year=datetime.now().year, month=datetime.now().strftime('%B'))
     #get current year:
     now=datetime.now()
     current_year = now.year 
+    #Query Events Model for dates:
+    event_list = Event.objects.filter(
+    event_date__year=year,
+    event_date__month=month_number
+)
+
     #get current time:
     time = now.strftime('%I:%M %p')   
     return render(request, 'events/home.html', {'name':name, 
@@ -46,7 +52,8 @@ def home(request, year=datetime.now().year, month=datetime.now().strftime('%B'))
                                                 'month_number':month_number,
                                                 'cal':cal,
                                                 'current_year': current_year,
-                                                'time':time,})
+                                                'time':time,
+                                                'event_list':event_list,})
 
 
 
@@ -58,7 +65,7 @@ def events(request):
 def add_venue(request):
     submitted=False
     if request.method == "POST":
-        form=VenueForm(request.POST)
+        form=VenueForm(request.POST, request.FILES)
         if form.is_valid():
             venue=form.save(commit=False) #don't save yet because we want to attach the id to the request
             venue.owner = request.user.id #user.id is the loggedin user
