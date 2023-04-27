@@ -58,14 +58,14 @@ def home(request, year=datetime.now().year, month=datetime.now().strftime('%B'))
 
 
 def events(request):
-    event_list = Event.objects.all().order_by('event_date')
+    event_list = Event.objects.all().order_by('-event_date')
     return render(request, 'events/event_list.html', {'event_list':event_list})
 
 
 def add_venue(request):
     submitted=False
     if request.method == "POST":
-        form=VenueForm(request.POST, request.FILES)
+        form=VenueForm(request.POST, request.FILES) 
         if form.is_valid():
             venue=form.save(commit=False) #don't save yet because we want to attach the id to the request
             venue.owner = request.user.id #user.id is the loggedin user
@@ -106,7 +106,7 @@ def search_venues(request):
     
 def update_venue(request, venue_id):
     venue=Venue.objects.get(pk=venue_id)
-    form = VenueForm(request.POST or None, instance=venue)
+    form = VenueForm(request.POST or None, request.FILES or None, instance=venue) #fills out the form with original data for us to edit
     if form.is_valid():
         form.save()
         return redirect('list_venues')

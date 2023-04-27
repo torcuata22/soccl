@@ -16,7 +16,8 @@
       <p class="card-text">
         
             <strong>Date:</strong> {{ event.event_date }} <br>
-            
+            <strong>Days 'till event:</strong> {{ event.Days_till }}<br>
+            <strong>Upcoming?</strong> {{ event.Is_past }}<br>
             <strong>Website:</strong> {{ event.venue.web }}<br>
             <strong>Manager:</strong> {{ event.manager }}<br>
             <strong>Description:</strong> {{ event.description }} <br>

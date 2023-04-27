@@ -1,9 +1,14 @@
 from django.contrib import admin
 from .models import Event, Venue, MyClubUser
+#Group is part of the auth system, so we need to import it:
+from django.contrib.auth.models import Group
 
 #admin.site.register(Event)
 #admin.site.register(Venue)
 admin.site.register(MyClubUser)
+
+#TO REMOVE GROUPS:
+admin.site.unregister(Group)
 
 #Admin panel customization:
 @admin.register(Venue)
