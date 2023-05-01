@@ -265,10 +265,11 @@ def search_events(request):
 
 #Admin approval page    
 def admin_approval(request):
+    #get venues:
+    venue_list = Venue.objects.all()
     event_count = Event.objects.all().count()
     venue_count = Venue.objects.all().count()
     user_count = User.objects.all().count()
-
 
 
     event_list = Event.objects.all().order_by('-event_date') #list all events in specific order
@@ -290,13 +291,32 @@ def admin_approval(request):
                                                                   'event_count':event_count,
                                                                   'venue_count':venue_count,
                                                                   'user_count':user_count, 
-                                                                  })
+                                                                  'venue_list':venue_list,})
 
     else:
         messages.success(request,('You shall not pass!') )
         return redirect('home')
     
     return render(request, 'events/admin_approval.html')
+
+#Show an event:
+def show_event(request, event_id):
+    event = Event.objects.get(pk=event_id)
+    return render(request, "events/show_event.html", {'event':event,})
+
+
+
+#Show events in a venue:
+def venue_events(request, venue_id):
+    #Grab venue:
+    venue = Venue.objects.get(id = venue_id)
+    #Grab events in that venue:
+    events = venue.event_set.all()
+    if events:
+        return render(request, "events/venue_events.html", {'events':events,})
+    else: 
+        messages.success(request, ('that venue has no events at this time'))
+        return redirect('admin_approval')
 
 
 #CONTINUE HERE: https://www.youtube.com/watch?v=hyzM1lpc6Rs&list=PLCC34OHNcOtqW9BJmgQPPzUpJ8hl49AGy&index=45
