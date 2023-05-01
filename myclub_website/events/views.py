@@ -94,7 +94,8 @@ def show_venue(request, venue_id):
     venue=Venue.objects.get(pk=venue_id)
     #query Venue to access name of the venue owner's username
     venue_owner = User.objects.get(pk=venue.owner)
-    return render(request, 'events/show_venue.html', {'venue':venue, 'venue_owner':venue_owner})
+    events = venue.event_set.all()
+    return render(request, 'events/show_venue.html', {'venue':venue, 'venue_owner':venue_owner, 'events':events})
 
 def search_venues(request):
     if request.method == 'POST':
@@ -319,4 +320,3 @@ def venue_events(request, venue_id):
         return redirect('admin_approval')
 
 
-#CONTINUE HERE: https://www.youtube.com/watch?v=hyzM1lpc6Rs&list=PLCC34OHNcOtqW9BJmgQPPzUpJ8hl49AGy&index=45

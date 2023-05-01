@@ -23,7 +23,17 @@
                 <img class="img-fluid" src="{{ venue.venue_image.url }}" alt="">
             {% endif %}
         </div>
+
+{% if events %}
+        <h3>Events at this venue:</h3>
+        {% for event in events %}
+        <a href="{% url 'show_event' event.id %}">{{event}}</a>
+        <br>
+        {% endfor %}
       </div>
+{% else %}
+No events scheduled at this time
+{% endif %}
 </div>
 
 
